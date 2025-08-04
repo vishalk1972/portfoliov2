@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Management System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>Portfolio Manager</h1>
+            </div>
+            <ul class="nav-menu" role="menubar">
+                <li role="none"><a href="#dashboard" role="menuitem" class="nav-link active" data-page="dashboard">Dashboard</a></li>
+                <li role="none"><a href="#stocks" role="menuitem" class="nav-link" data-page="stocks">Stocks</a></li>
+                <li role="none"><a href="#portfolio" role="menuitem" class="nav-link" data-page="portfolio">Portfolio</a></li>
+                <li role="none"><a href="#watchlist" role="menuitem" class="nav-link" data-page="watchlist">Watchlist</a></li>
+                <li role="none"><a href="#wallet" role="menuitem" class="nav-link" data-page="wallet">Wallet</a></li>
+                <li role="none"><a href="#transactions" role="menuitem" class="nav-link" data-page="transactions">Transactions</a></li>
+            </ul>
+            <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Dashboard Page -->
+        <section id="dashboard" class="page active" role="main" aria-labelledby="dashboard-title">
+            <div class="container">
+                <h2 id="dashboard-title">Dashboard</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Portfolio Value</h3>
+                        <p class="stat-value" id="portfolio-value">$0.00</p>
+                        <span class="stat-change" id="portfolio-change">+0.00%</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Invested</h3>
+                        <p class="stat-value" id="total-invested">$0.00</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Profit/Loss</h3>
+                        <p class="stat-value" id="profit-loss">$0.00</p>
+                        <span class="stat-change" id="profit-loss-percent">+0.00%</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Wallet Balance</h3>
+                        <p class="stat-value" id="wallet-balance">$0.00</p>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Portfolio Distribution</h3>
+                        <canvas id="portfolioChart" aria-label="Portfolio distribution pie chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Performance Overview</h3>
+                        <canvas id="performanceChart" aria-label="Performance overview bar chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="recent-transactions">
+                    <h3>Recent Transactions</h3>
+                    <div class="table-container">
+                        <table class="data-table" role="table">
+                            <thead>
+                                <tr role="row">
+                                    <th role="columnheader">Stock</th>
+                                    <th role="columnheader">Type</th>
+                                    <th role="columnheader">Quantity</th>
+                                    <th role="columnheader">Price</th>
+                                    <th role="columnheader">Total</th>
+                                    <th role="columnheader">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-transactions-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stocks Page -->
+        <section id="stocks" class="page" role="main" aria-labelledby="stocks-title">
+            <div class="container">
+                <h2 id="stocks-title">All Stocks</h2>
+                
+                <div class="search-container">
+                    <input type="text" id="stock-search" placeholder="Search stocks..." aria-label="Search stocks" class="search-input">
+                    <button id="search-btn" class="btn btn-primary" aria-label="Search">Search</button>
+                </div>
+
+                <div class="stocks-grid" id="stocks-grid">
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolio Page -->
+        <section id="portfolio" class="page" role="main" aria-labelledby="portfolio-title">
+            <div class="container">
+                <h2 id="portfolio-title">My Portfolio</h2>
+                
+                <div class="portfolio-summary">
+                    <div class="summary-card">
+                        <h3>Total Holdings</h3>
+                        <p id="total-holdings-count">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Best Performer</h3>
+                        <p id="best-performer">-</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Worst Performer</h3>
+                        <p id="worst-performer">-</p>
+                    </div>
+                </div>
+
+                <div class="holdings-container">
+                    <div class="table-container">
+                        <table class="data-table" role="table">
+                            <thead>
+                                <tr role="row">
+                                    <th role="columnheader">Stock</th>
+                                    <th role="columnheader">Quantity</th>
+                                    <th role="columnheader">Avg. Buy Price</th>
+                                    <th role="columnheader">Current Value</th>
+                                    <th role="columnheader">P&L</th>
+                                    <th role="columnheader">P&L %</th>
+                                    <th role="columnheader">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="holdings-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Watchlist Page -->
+        <section id="watchlist" class="page" role="main" aria-labelledby="watchlist-title">
+            <div class="container">
+                <h2 id="watchlist-title">Watchlist</h2>
+                
+                <div class="watchlist-container">
+                    <div class="table-container">
+                        <table class="data-table" role="table">
+                            <thead>
+                                <tr role="row">
+                                    <th role="columnheader">Stock</th>
+                                    <th role="columnheader">Symbol</th>
+                                    <th role="columnheader">Current Price</th>
+                                    <th role="columnheader">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="watchlist-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wallet Page -->
+        <section id="wallet" class="page" role="main" aria-labelledby="wallet-title">
+            <div class="container">
+                <h2 id="wallet-title">Wallet</h2>
+                
+                <div class="wallet-card">
+                    <h3>Current Balance</h3>
+                    <p class="balance-amount" id="current-balance">$0.00</p>
+                    
+                    <div class="wallet-actions">
+                        <button class="btn btn-success" id="add-money-btn">Add Money</button>
+                        <button class="btn btn-danger" id="withdraw-money-btn">Withdraw Money</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions Page -->
+        <section id="transactions" class="page" role="main" aria-labelledby="transactions-title">
+            <div class="container">
+                <h2 id="transactions-title">Transaction History</h2>
+                
+                <div class="table-container">
+                    <table class="data-table" role="table">
+                        <thead>
+                            <tr role="row">
+                                <th role="columnheader">Date</th>
+                                <th role="columnheader">Stock</th>
+                                <th role="columnheader">Type</th>
+                                <th role="columnheader">Quantity</th>
+                                <th role="columnheader">Price</th>
+                                <th role="columnheader">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <div id="stock-modal" class="modal" role="dialog" aria-labelledby="stock-modal-title" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="stock-modal-title">Stock Details</h3>
+                <button class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="stock-info">
+                    <h4 id="modal-stock-name">Stock Name</h4>
+                    <p id="modal-stock-symbol">SYMBOL</p>
+                    <p class="current-price">Current Price: $<span id="modal-current-price">0.00</span></p>
+                </div>
+                
+                <div class="price-chart-container">
+                    <canvas id="priceChart" aria-label="Stock price chart"></canvas>
+                </div>
+                
+                <div class="trade-actions">
+                    <div class="trade-form">
+                        <label for="trade-quantity">Quantity:</label>
+                        <input type="number" id="trade-quantity" min="1" value="1" aria-label="Trade quantity">
+                        
+                        <div class="trade-buttons">
+                            <button class="btn btn-success" id="buy-btn">Buy</button>
+                            <button class="btn btn-danger" id="sell-btn">Sell</button>
+                            <button class="btn btn-secondary" id="add-to-watchlist-btn">Add to Watchlist</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="money-modal" class="modal" role="dialog" aria-labelledby="money-modal-title" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="money-modal-title">Manage Wallet</h3>
+                <button class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="money-form">
+                    <label for="money-amount">Amount:</label>
+                    <input type="number" id="money-amount" min="0.01" step="0.01" aria-label="Money amount">
+                    
+                    <div class="money-buttons">
+                        <button class="btn btn-success" id="confirm-add-money">Add Money</button>
+                        <button class="btn btn-danger" id="confirm-withdraw-money">Withdraw Money</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-spinner" id="loading-spinner" aria-hidden="true">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="notification" class="notification" role="alert" aria-live="polite"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
