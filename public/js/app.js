@@ -95,8 +95,10 @@ function initializeNavigation() {
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".navbar")) {
       navMenu.classList.remove("active")
-      mobileToggle.classList.remove("active")
-      mobileToggle.setAttribute("aria-expanded", "false")
+      if (mobileToggle) {
+        mobileToggle.classList.remove("active")
+        mobileToggle.setAttribute("aria-expanded", "false")
+      }
     }
   })
 }
@@ -107,7 +109,10 @@ async function navigateToPage(page) {
     document.querySelectorAll(".nav-link").forEach((link) => {
       link.classList.remove("active")
     })
-    document.querySelector(`[data-page="${page}"]`).classList.add("active")
+    const activeLink = document.querySelector(`[data-page="${page}"]`)
+    if (activeLink) {
+      activeLink.classList.add("active")
+    }
 
     // Hide all pages
     document.querySelectorAll(".page").forEach((p) => {
@@ -115,7 +120,10 @@ async function navigateToPage(page) {
     })
 
     // Show target page
-    document.getElementById(page).classList.add("active")
+    const targetPage = document.getElementById(page)
+    if (targetPage) {
+      targetPage.classList.add("active")
+    }
     currentPage = page
 
     // Load page data
@@ -327,7 +335,10 @@ async function openStockModal(stockId) {
     }
 
     // Reset trade form
-    document.getElementById("trade-quantity").value = "1"
+    const quantityInput = document.getElementById("trade-quantity")
+    if (quantityInput) {
+      quantityInput.value = "1"
+    }
 
     openModal("stock-modal")
   } catch (error) {
@@ -476,15 +487,15 @@ function openMoneyModal(action) {
   const withdrawBtn = document.getElementById("confirm-withdraw-money")
   const amountInput = document.getElementById("money-amount")
 
-  title.textContent = action === "add" ? "Add Money" : "Withdraw Money"
-  amountInput.value = ""
+  if (title) title.textContent = action === "add" ? "Add Money" : "Withdraw Money"
+  if (amountInput) amountInput.value = ""
 
   if (action === "add") {
-    addBtn.style.display = "inline-flex"
-    withdrawBtn.style.display = "none"
+    if (addBtn) addBtn.style.display = "inline-flex"
+    if (withdrawBtn) withdrawBtn.style.display = "none"
   } else {
-    addBtn.style.display = "none"
-    withdrawBtn.style.display = "inline-flex"
+    if (addBtn) addBtn.style.display = "none"
+    if (withdrawBtn) withdrawBtn.style.display = "inline-flex"
   }
 
   openModal("money-modal")
@@ -533,7 +544,9 @@ function initializeModals() {
   document.querySelectorAll(".modal-close").forEach((closeBtn) => {
     closeBtn.addEventListener("click", (e) => {
       const modal = e.target.closest(".modal")
-      closeModal(modal.id)
+      if (modal) {
+        closeModal(modal.id)
+      }
     })
   })
 
@@ -592,7 +605,8 @@ async function executeTrade(action) {
       throw new Error("No stock selected")
     }
 
-    const quantity = Number.parseInt(document.getElementById("trade-quantity").value)
+    const quantityInput = document.getElementById("trade-quantity")
+    const quantity = Number.parseInt(quantityInput?.value || "0")
     const price = currentStock.currentPrice
 
     if (!validateNumber(quantity, 1)) {
@@ -643,7 +657,8 @@ async function addToWatchlist() {
 
 async function executeMoneyAction(action) {
   try {
-    const amount = Number.parseFloat(document.getElementById("money-amount").value)
+    const amountInput = document.getElementById("money-amount")
+    const amount = Number.parseFloat(amountInput?.value || "0")
 
     if (!validateNumber(amount, 0.01)) {
       throw new Error("Please enter a valid amount")
@@ -670,6 +685,10 @@ async function executeMoneyAction(action) {
     handleError(error, `${action} money`)
   }
 }
+
+// Make functions globally available
+window.openStockModal = openStockModal
+window.removeFromWatchlist = removeFromWatchlist
 
 // Add CSS classes for badges and status indicators
 const additionalStyles = `

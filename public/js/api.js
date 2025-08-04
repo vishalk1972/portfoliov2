@@ -1,22 +1,13 @@
 // API Configuration
 const API_BASE_URL = "/api"
 
-// Import necessary modules
-const axios = require("axios")
-const showLoading = (isLoading) => {
-  if (isLoading) {
-    console.log("Loading...")
-  } else {
-    console.log("Done.")
-  }
-}
-
 // API Helper Functions
 const api = {
   // Generic request handler
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`
     const config = {
+      method: options.method || "GET",
       headers: {
         "Content-Type": "application/json",
         ...options.headers,
@@ -30,11 +21,17 @@ const api = {
 
     try {
       showLoading(true)
-      const response = await axios(url, config)
-      return response.data
+      const response = await fetch(url, config)
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Request failed")
+      }
+
+      return data
     } catch (error) {
       console.error("API Error:", error)
-      throw error.response?.data || error.message
+      throw error
     } finally {
       showLoading(false)
     }
@@ -97,4 +94,12 @@ const api = {
         method: "DELETE",
       }),
   },
+}
+
+const showLoading = (isLoading) => {
+  if (isLoading) {
+    console.log("Loading...")
+  } else {
+    console.log("Done.")
+  }
 }

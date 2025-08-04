@@ -4,7 +4,7 @@ let portfolioChart = null
 let performanceChart = null
 let priceChart = null
 
-// Declare variables before using them
+// Utility functions
 function formatCurrency(value) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value)
 }
@@ -58,7 +58,8 @@ function initializePortfolioChart() {
             label: (context) => {
               const label = context.label || ""
               const value = formatCurrency(context.raw)
-              const percentage = ((context.raw / context.dataset.data.reduce((a, b) => a + b, 0)) * 100).toFixed(1)
+              const total = context.dataset.data.reduce((a, b) => a + b, 0)
+              const percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : 0
               return `${label}: ${value} (${percentage}%)`
             },
           },
